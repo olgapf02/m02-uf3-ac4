@@ -4,7 +4,6 @@ Created on February 2023
 
 @author: Albert ETPX
 """
-
 # Importación de módulos externos
 import mysql.connector
 from flask import Flask,render_template,request;
@@ -16,7 +15,7 @@ def connectBD():
     db = mysql.connector.connect(
         host = "localhost",
         user = "root",
-        passwd = "claumestra",
+        passwd = "gaol1920",
         database = "users"
     )
     return db
