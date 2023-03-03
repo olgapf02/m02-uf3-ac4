@@ -52,20 +52,29 @@ def initBD():
 
 # checkUser: comprueba si el par usuario-contraseña existe en la BD
 def checkUser(user,password):
-    bd=connectBD()
-    cursor=bd.cursor()
+    # bd=connectBD()
+    # cursor=bd.cursor()
 
-    query=f"SELECT user,name,surname1,surname2,age,genre FROM users WHERE user='{user}'\
-            AND password='{password}'"
-    print(query)
-    cursor.execute(query)
-    userData = cursor.fetchall()
-    bd.close()
+    # query=f"SELECT user,name,surname1,surname2,age,genre FROM users WHERE user='{user}'\
+    #         AND password='{password}'"
+    # print(query)
+    # cursor.execute(query)
+    # userData = cursor.fetchall()
+    # bd.close()
     
-    if userData == []:
-        return False
+    # if userData == []:
+    #     return False
+    # else:
+    #     return userData[0]
+    query = "SELECT * FROM users WHERE username=%s AND password=%s"
+    values = (username, password)
+    cursor.execute(query, values)
+    result = cursor.fetchone()
+    if result:
+        return True
     else:
-        return userData[0]
+        return False
+
 
 # cresteUser: crea un nuevo usuario en la BD
 def createUser(user,password,name,surname1,surname2,age,genre):
