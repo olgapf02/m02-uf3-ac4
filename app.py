@@ -52,29 +52,21 @@ def initBD():
 
 # checkUser: comprueba si el par usuario-contraseña existe en la BD
 def checkUser(user,password):
-    # bd=connectBD()
-    # cursor=bd.cursor()
+    bd=connectBD()
+    cursor=bd.cursor()
 
-    # query=f"SELECT user,name,surname1,surname2,age,genre FROM users WHERE user='{user}'\
-    #         AND password='{password}'"
-    # print(query)
-    # cursor.execute(query)
-    # userData = cursor.fetchall()
-    # bd.close()
+    query=f"SELECT user,name,surname1,surname2,age,genre FROM users WHERE user=%s \
+            AND password=%s"
+    param= (user,password)
+    print(query)
+    cursor.execute(query,param)
+    userData = cursor.fetchall()
+    bd.close()
     
-    # if userData == []:
-    #     return False
-    # else:
-    #     return userData[0]
-    query = "SELECT * FROM users WHERE username=%s AND password=%s"
-    values = (username, password)
-    cursor.execute(query, values)
-    result = cursor.fetchone()
-    if result:
-        return True
-    else:
+    if userData == []:
         return False
-
+    else:
+        return userData[0]
 
 # cresteUser: crea un nuevo usuario en la BD
 def createUser(user,password,name,surname1,surname2,age,genre):
@@ -97,7 +89,7 @@ def login():
 
 @app.route("/signin")
 def signin():
-    return "SIGN IN PAGE"
+    return render_template("signin.html")
 
 @app.route("/results",methods=('GET', 'POST'))
 def results():
@@ -111,6 +103,38 @@ def results():
             return render_template("results.html",login=False)
         else:
             return render_template("results.html",login=True,userData=userData)
+        
+
+@app.route('/newUser', methods=['POST'])
+def register():
+    # Obté les dades del formulari
+    username = request.form['username']
+    password = request.form['password']
+    nom = request.form['nom']
+    cognom1 = request.form['cognom1']
+    cognom2 = request.form['cognom2']
+    edat = request.form['edat']
+    salari = request.form['salari']
+
+
+# Funció per a crear un nou usuari a la base de dades
+def createUser(username, password, nom, cognom1, cognom2, edat, salari):
+    # Connecta amb la base de dades
+    conn = bd=connectBD()
+    # Crea un cursor per a executar les sentències SQL
+    cursor=bd.cursor()
+    # Sentència SQL per a inserir un nou usuari a la base de dades
+    query = """INSERT INTO users (username, password, nom, cognom1, cognom2, edat, salari)
+               VALUES (%s, %s, %s, %s, %s, %s, %s)"""
+    # Valors per a la sentència parametritzada
+    values = (username, password, nom, cognom1, cognom2, edat, salari)
+    # Executa la sentència SQL amb els valors
+    cursor.execute(query, values)
+    # Confirma els canvis a la base de dades
+    conn.commit()
+    # Tanca la connexió i el cursor
+    cursor.close()
+    conn.close()
         
 # Configuración y arranque de la aplicación web
 app.config['TEMPLATES_AUTO_RELOAD'] = True
