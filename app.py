@@ -106,8 +106,9 @@ def results():
         
 
 @app.route('/newUser', methods=['POST'])
-def register():
+def proceso_registro():
     # Obté les dades del formulari
+    formData = request.form
     username = request.form['username']
     password = request.form['password']
     nom = request.form['nom']
@@ -116,25 +117,32 @@ def register():
     edat = request.form['edat']
     salari = request.form['salari']
 
+    # cridar la funció per crear l'usuari
+    if createUser(username,password,nom,cognom1,cognom2,edat,salari):
+       # si s'ha creat correctament, redirigir a la pàgina d'inici
+        return redirect('/')
+    else:
+        #  si no s'ha creat, tornar a la pàgina de registre amb un missatge d'error
+        return render_template('signin.html', error='Error creating user')
 
-# Funció per a crear un nou usuari a la base de dades
+
 def createUser(username, password, nom, cognom1, cognom2, edat, salari):
-    # Connecta amb la base de dades
-    conn = bd=connectBD()
-    # Crea un cursor per a executar les sentències SQL
-    cursor=bd.cursor()
-    # Sentència SQL per a inserir un nou usuari a la base de dades
-    query = """INSERT INTO users (username, password, nom, cognom1, cognom2, edat, salari)
+    try:
+        # connectar amb la base de dades
+        conn = bd=connectBD()
+        cursor = bd.cursor()
+        # inserir l'usuari a la base de dades
+        query = """INSERT INTO users (username, password, nom, cognom1, cognom2, edat, salari)
                VALUES (%s, %s, %s, %s, %s, %s, %s)"""
-    # Valors per a la sentència parametritzada
-    values = (username, password, nom, cognom1, cognom2, edat, salari)
-    # Executa la sentència SQL amb els valors
-    cursor.execute(query, values)
-    # Confirma els canvis a la base de dades
-    conn.commit()
-    # Tanca la connexió i el cursor
-    cursor.close()
-    conn.close()
+        # guardar els canvis i tancar la connexió
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return True
+    except:
+        return False
+
         
 # Configuración y arranque de la aplicación web
 app.config['TEMPLATES_AUTO_RELOAD'] = True
